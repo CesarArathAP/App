@@ -3,7 +3,7 @@ import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Image, Ale
 import { Card } from 'react-native-elements';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { launchImageLibrary } from 'react-native-image-picker';
-import registrarVisitaApi from '../api/apivisitas';
+import registrarVisita from '../util/RegistrarVisitas';
 
 const getCurrentTime = () => {
   const now = new Date();
@@ -24,6 +24,11 @@ const VisitasScreen = () => {
   const [showTimePicker, setShowTimePicker] = useState(false);
 
   const handleSubmit = async () => {
+    if (!visitante || !motivo || !area || !fecha || !horaEntrada || !foto) {
+      Alert.alert('Error', 'Todos los campos son obligatorios, incluyendo la foto de identificación');
+      return;
+    }
+
     try {
       const datosVisita = {
         visitante: visitante,
@@ -35,7 +40,7 @@ const VisitasScreen = () => {
         fotografia: foto
       };
       
-      await registrarVisitaApi(datosVisita);
+      await registrarVisita(datosVisita);
 
       // Limpiar el formulario después de enviar los datos
       setVisitante('');

@@ -1,21 +1,16 @@
-const apiUrl = 'http://192.168.1.40:3000/registrar-visita'; // 130.131.4.148, 192.168.1.40
+import axios from 'axios';
+
+const apiUrl = 'http://192.168.1.40:3000/registrar-visita';
 
 const registrarVisitaApi = async (datosVisita) => {
   try {
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(datosVisita),
-    });
+    const response = await axios.post(apiUrl, datosVisita);
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error('Error al registrar la visita');
     }
 
-    const data = await response.json();
-    return data;
+    return response.data;
   } catch (error) {
     throw new Error(error.message);
   }
