@@ -34,7 +34,7 @@ const VisitasScreen = () => {
         visitante: visitante,
         motivo: motivo,
         area: area,
-        fecha: fecha.toISOString(),
+        fecha: formatDate(fecha), // Aquí se ajusta el formato de la fecha
         hora_entrada: horaEntrada,
         hora_salida: horaSalida,
         fotografia: `data:image/jpeg;base64,${foto}` // Agregar "data:image/jpeg;base64," a la cadena de la imagen base64
@@ -101,8 +101,10 @@ const VisitasScreen = () => {
   };
 
   const formatDate = (date) => {
-    const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
-    return date.toLocaleDateString('es-ES', options).replace(/\//g, '-');
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is zero-based
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
   };
 
   return (
