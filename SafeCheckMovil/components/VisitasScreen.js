@@ -40,8 +40,6 @@ const VisitasScreen = () => {
         fotografia: `data:image/jpeg;base64,${foto}` // Agregar "data:image/jpeg;base64," a la cadena de la imagen base64
       };
 
-      console.log('Datos del formulario:', JSON.stringify(datosVisita));
-
       await registrarVisita(datosVisita);
 
       // Limpiar el formulario después de enviar los datos
