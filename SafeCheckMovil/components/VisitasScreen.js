@@ -39,7 +39,9 @@ const VisitasScreen = () => {
         hora_salida: horaSalida,
         fotografia: foto
       };
-      
+
+      console.log('Datos del formulario:', JSON.stringify(datosVisita));
+  
       await registrarVisita(datosVisita);
 
       // Limpiar el formulario después de enviar los datos
@@ -50,13 +52,13 @@ const VisitasScreen = () => {
       setHoraEntrada(getCurrentTime());
       setHoraSalida('');
       setFoto('');
-      // Puedes agregar cualquier lógica adicional después de enviar los datos
+        
       Alert.alert('Éxito', 'La visita ha sido registrada exitosamente');
     } catch (error) {
       console.error('Error al registrar la visita:', error.message);
       Alert.alert('Error', 'Ha ocurrido un error al registrar la visita');
     }
-  };
+  }; 
 
   const onChangeDate = (event, selectedDate) => {
     const currentDate = selectedDate || fecha;
