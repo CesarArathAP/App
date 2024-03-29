@@ -41,7 +41,7 @@ const VisitasScreen = () => {
       };
 
       console.log('Datos del formulario:', JSON.stringify(datosVisita));
-  
+
       await registrarVisita(datosVisita);
 
       // Limpiar el formulario después de enviar los datos
@@ -52,7 +52,7 @@ const VisitasScreen = () => {
       setHoraEntrada(getCurrentTime());
       setHoraSalida('');
       setFoto('');
-        
+
       Alert.alert('Éxito', 'La visita ha sido registrada exitosamente');
     } catch (error) {
       console.error('Error al registrar la visita:', error.message);
