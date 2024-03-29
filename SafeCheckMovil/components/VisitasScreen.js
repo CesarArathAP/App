@@ -37,7 +37,7 @@ const VisitasScreen = () => {
         fecha: fecha.toISOString(),
         hora_entrada: horaEntrada,
         hora_salida: horaSalida,
-        fotografia: foto
+        fotografia: `data:image/jpeg;base64,${foto}` // Agregar "data:image/jpeg;base64," a la cadena de la imagen base64
       };
 
       console.log('Datos del formulario:', JSON.stringify(datosVisita));
@@ -66,15 +66,16 @@ const VisitasScreen = () => {
     setFecha(currentDate);
   };
 
+  // Función para manejar la selección de la imagen
   const handleChoosePhoto = () => {
     const options = {
       mediaType: 'photo',
       quality: 0.5,
-      includeBase64: false,
+      includeBase64: true, // Solicitar que se incluya la representación base64 de la imagen
       maxWidth: 500,
       maxHeight: 500,
     };
-  
+
     launchImageLibrary(options, (response) => {
       if (response.didCancel) {
         console.log('El usuario canceló la selección de la imagen');
@@ -82,8 +83,8 @@ const VisitasScreen = () => {
         console.log('Error al seleccionar la imagen:', response.error);
       } else {
         if (response.assets && response.assets.length > 0) {
-          const source = response.assets[0].uri;
-          setFoto(source);
+          const base64Image = response.assets[0].base64; // Obtener la representación base64 de la imagen
+          setFoto(base64Image); // Establecer la imagen como base64 en el estado
         } else {
           console.log('No se encontraron imágenes seleccionadas');
         }
@@ -137,7 +138,7 @@ const VisitasScreen = () => {
         )}
         <TextInput style={styles.input} placeholder="Hora de salida" placeholderTextColor="#ccc" value={horaSalida} onChangeText={setHoraSalida} />
         {foto !== '' && (
-          <Image source={{ uri: foto }} style={styles.image} />
+          <Image source={{ uri: `data:image/jpeg;base64,${foto}` }} style={styles.image} />
         )}
 
         <Button title="Seleccionar Foto" onPress={handleChoosePhoto} />
