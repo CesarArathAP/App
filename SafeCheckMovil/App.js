@@ -14,6 +14,8 @@ import CarrerasScreen from './components/CarrerasScreen';
 import AlumnosCarreraScreen from './components/AlumnosCarreraScreen';
 import TestScreen from './components/TestScreen';
 import VisitasScreen from './components/VisitasScreen';
+import VerVisitasScreen from './components/VerVisitasScreen';
+import OptionsVisitaScreen from './components/OptionsVisitaScreen';
 
 const Stack = createStackNavigator();
 
@@ -35,6 +37,8 @@ export default function App() {
         <Stack.Screen name="AlumnosCarreraScreen" component={AlumnosCarreraScreen} />
         <Stack.Screen name="TestScreen" component={TestScreen} />
         <Stack.Screen name="VisitasScreen" component={VisitasScreen} />
+        <Stack.Screen name="VerVisitas" component={VerVisitasScreen} />
+        <Stack.Screen name="OptionsVisita" component={OptionsVisitaScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

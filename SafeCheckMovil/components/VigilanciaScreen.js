@@ -14,6 +14,10 @@ const VigilanciaScreen = ({ route }) => {
     navigation.navigate('VisitasScreen')
   }
 
+  const VerVisitas = () => {
+    navigation.navigate('VerVisitas')
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -24,6 +28,9 @@ const VigilanciaScreen = ({ route }) => {
         <View style={styles.menu}>
           <TouchableOpacity style={styles.option} onPress={VisitasScreen}>
             <Text style={styles.optionText}>Registrar Visita</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.option} onPress={VerVisitas}>
+            <Text style={styles.optionText}>Visitas</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.option} onPress={handleBuscarAlumnos}>
               <Text style={styles.optionText}>Buscar Alumnos</Text>

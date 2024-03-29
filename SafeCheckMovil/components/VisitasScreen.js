@@ -7,9 +7,11 @@ import registrarVisita from '../util/RegistrarVisitas';
 
 const getCurrentTime = () => {
   const now = new Date();
-  const hours = String(now.getHours()).padStart(2, '0');
+  const hours = now.getHours();
   const minutes = String(now.getMinutes()).padStart(2, '0');
-  return `${hours}:${minutes}`;
+  const period = hours >= 12 ? 'p.m.' : 'a.m.';
+  const adjustedHours = hours % 12 || 12; // Ajustar las horas al formato de 12 horas
+  return `${adjustedHours}:${minutes} ${period}`;
 };
 
 const VisitasScreen = () => {
