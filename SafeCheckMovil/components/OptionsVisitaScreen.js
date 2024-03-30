@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert, Modal, TouchableWithoutFeedback } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import updateVisitaUtil from '../util/UpdateVisitaUtil'; // Importar la función de utilidad
 
 const OptionsVisitaScreen = ({ route, navigation }) => {
   const [horaSalida, setHoraSalida] = useState('');
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const obtenerHoraActual = () => {
     const now = new Date();
@@ -42,18 +43,20 @@ const OptionsVisitaScreen = ({ route, navigation }) => {
       console.error('Error al actualizar la visita:', error);
       Alert.alert('Error', 'Ocurrió un error al actualizar la visita');
     }
-  };  
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollView}>
       <View style={styles.container}>
         <View style={styles.card}>
-          {route.params.visita.fotografia && (
-            <Image
-              source={{ uri: route.params.visita.fotografia }}
-              style={{ width: '100%', height: 200, resizeMode: 'cover', borderTopLeftRadius: 10, borderTopRightRadius: 10 }}
-            />
-          )}
+          <TouchableOpacity onPress={() => setShowModal(true)}>
+            {route.params.visita.fotografia && (
+              <Image
+                source={{ uri: route.params.visita.fotografia }}
+                style={styles.image}
+              />
+            )}
+          </TouchableOpacity>
 
           <Text style={styles.label}>Nombre:</Text>
           <Text style={[styles.input, styles.disabled]}>{route.params.visita.visitante}</Text>
@@ -90,6 +93,17 @@ const OptionsVisitaScreen = ({ route, navigation }) => {
           <Text style={styles.buttonText}>Actualizar hora de salida</Text>
         </TouchableOpacity>
       </View>
+
+      <Modal visible={showModal} transparent={true}>
+        <View style={styles.modalContainer}>
+          <TouchableWithoutFeedback onPress={() => setShowModal(false)}>
+            <Image
+              source={{ uri: route.params.visita.fotografia }}
+              style={styles.modalImage}
+            />
+          </TouchableWithoutFeedback>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -114,6 +128,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+  image: {
+    width: '100%',
+    height: 200,
+    resizeMode: 'cover',
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
   },
   label: {
     fontSize: 16,
@@ -146,6 +167,17 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  },
+  modalImage: {
+    width: '80%',
+    height: '80%',
+    resizeMode: 'contain',
   },
 });
 
