@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image, TouchableOp
 import { useNavigation } from '@react-navigation/native';
 import obtenerVisitas from '../util/ObtenerVisitasController';
 
-const VerVisitasScreen = () => {
+const VerVisitasScreen = ({ route }) => {
   const [visitas, setVisitas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -13,7 +13,16 @@ const VerVisitasScreen = () => {
 
   useEffect(() => {
     cargarVisitas();
-  }, []);
+    // Escuchar el parámetro refresh al cargar el componente
+    const unsubscribe = navigation.addListener('focus', () => {
+      if (route.params && route.params.refresh) {
+        // Si se solicita un refrescamiento, cargar las visitas nuevamente
+        cargarVisitas();
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation, route.params]);
 
   const cargarVisitas = async () => {
     try {

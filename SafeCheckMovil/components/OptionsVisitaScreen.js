@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import updateVisitaUtil from '../util/UpdateVisitaUtil'; // Importar la función de utilidad
 
-const OptionsVisitaScreen = ({ route }) => {
-  // Estado local para la hora de salida
+const OptionsVisitaScreen = ({ route, navigation }) => {
   const [horaSalida, setHoraSalida] = useState('');
-
-  // Estado local para mostrar o no el selector de hora
   const [showTimePicker, setShowTimePicker] = useState(false);
 
-  // Función para obtener la hora actual en el formato deseado (hh:mm a)
   const obtenerHoraActual = () => {
     const now = new Date();
     const hours = now.getHours();
@@ -20,12 +17,10 @@ const OptionsVisitaScreen = ({ route }) => {
     return `${formattedHours}:${formattedMinutes} ${ampm}`;
   };
 
-  // Establecer la hora actual al cargar el componente
   useEffect(() => {
     setHoraSalida(obtenerHoraActual());
   }, []);
 
-  // Función para manejar el cambio de hora seleccionada
   const onChangeHoraSalida = (event, selectedDate) => {
     const currentDate = selectedDate || new Date();
     setShowTimePicker(false);
@@ -37,17 +32,22 @@ const OptionsVisitaScreen = ({ route }) => {
     setHoraSalida(`${formattedHours}:${formattedMinutes} ${ampm}`);
   };
 
-  // Función para manejar la actualización de la hora de salida
-  const handleUpdateHoraSalida = () => {
-    // Aquí deberías implementar la lógica para actualizar la hora de salida
-    console.log('Nueva hora de salida:', horaSalida);
-  };
+  const handleUpdateHoraSalida = async () => {
+    try {
+      await updateVisitaUtil(route.params.visita.id, horaSalida);
+      Alert.alert('Éxito', 'La hora de salida se actualizó correctamente', [
+        { text: 'OK', onPress: () => navigation.navigate('VerVisitas', { refresh: true }) }
+      ]);
+    } catch (error) {
+      console.error('Error al actualizar la visita:', error);
+      Alert.alert('Error', 'Ocurrió un error al actualizar la visita');
+    }
+  };  
 
   return (
     <ScrollView contentContainerStyle={styles.scrollView}>
       <View style={styles.container}>
         <View style={styles.card}>
-          {/* Colocar la imagen dentro de la tarjeta */}
           {route.params.visita.fotografia && (
             <Image
               source={{ uri: route.params.visita.fotografia }}
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: 'black',
     marginLeft: 10,
-    marginRight: 10, // Agregar margen horizontal
+    marginRight: 10,
   },
   disabled: {
     opacity: 0.5,
