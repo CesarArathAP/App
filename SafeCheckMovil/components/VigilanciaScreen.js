@@ -18,6 +18,10 @@ const VigilanciaScreen = ({ route }) => {
     navigation.navigate('VerVisitas')
   }
 
+  const VerAlumnosTest = () => {
+    navigation.navigate('AlumnosTestScreen')
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -35,7 +39,7 @@ const VigilanciaScreen = ({ route }) => {
           <TouchableOpacity style={styles.option} onPress={handleBuscarAlumnos}>
               <Text style={styles.optionText}>Buscar Alumnos</Text>
             </TouchableOpacity>
-          <TouchableOpacity style={styles.option}>
+          <TouchableOpacity style={styles.option} onPress={VerAlumnosTest}>
             <Text style={styles.optionText}>Test de Alumnos</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.option}>

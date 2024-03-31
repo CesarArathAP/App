@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { enviarResultadoPrueba } from '../util/TestAlumnosUtil';
 
 const TestScreen = ({ route, navigation }) => {
   const { alumno } = route.params;
   const [resultado, setResultado] = useState('');
   const [pruebaEnviada, setPruebaEnviada] = useState(false);
+  const [fecha, setFecha] = useState(new Date().toLocaleDateString());
+  const [hora, setHora] = useState('');
+
+  useEffect(() => {
+    const date = new Date();
+    const formattedHour = `${date.getHours()}:${date.getMinutes()} ${date.getHours() < 12 ? 'a.m.' : 'p.m.'}`;
+    setHora(formattedHour);
+  }, []);
 
   const handleInputChange = (text) => {
     const regex = /^\d*\.?\d*$/;
@@ -13,7 +22,7 @@ const TestScreen = ({ route, navigation }) => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (resultado.trim() === '') {
       Alert.alert(
         'Campo Vacío',
@@ -21,15 +30,37 @@ const TestScreen = ({ route, navigation }) => {
         [{ text: 'OK', onPress: () => console.log('OK Pressed') }]
       );
     } else {
-      console.log('Resultado de la prueba:', resultado);
-      setPruebaEnviada(true);
-      Alert.alert(
-        'Prueba Realizada con éxito',
-        `La prueba ha sido realizada con éxito para ${alumno.nombre}`,
-        [{ text: 'OK', onPress: () => navigation.navigate('CarrerasScreen') }]
-      );
+      const formData = {
+        alumno: {
+          matricula: alumno.matricula,
+          nombre: `${alumno.nombre} ${alumno.apellido_paterno} ${alumno.apellido_materno}`,
+          grupo: alumno.grupo,
+        },
+        resultado: resultado,
+        fecha: fecha,
+        hora: hora,
+      };
+      
+      console.log('Datos del formulario:', formData);
+
+      try {
+        await enviarResultadoPrueba(formData);
+        setPruebaEnviada(true);
+        Alert.alert(
+          'Prueba Realizada con éxito',
+          `La prueba ha sido realizada con éxito para ${alumno.nombre}`,
+          [{ text: 'OK', onPress: () => navigation.navigate('CarrerasScreen') }]
+        );
+      } catch (error) {
+        console.error('Error al enviar los datos:', error);
+        Alert.alert(
+          'Error',
+          'Hubo un error al enviar los datos. Por favor, inténtalo de nuevo más tarde.',
+          [{ text: 'OK', onPress: () => console.log('OK Pressed') }]
+        );
+      }
     }
-  };  
+  };    
 
   return (
     <View style={styles.card}>
@@ -56,6 +87,22 @@ const TestScreen = ({ route, navigation }) => {
           <TextInput
             style={styles.textInput}
             value={alumno.grupo}
+            editable={false}
+          />
+        </View>
+        <View style={styles.infoContainer}>
+          <Text style={styles.label}>Fecha:</Text>
+          <TextInput
+            style={styles.textInput}
+            value={fecha}
+            editable={false}
+          />
+        </View>
+        <View style={styles.infoContainer}>
+          <Text style={styles.label}>Hora:</Text>
+          <TextInput
+            style={styles.textInput}
+            value={hora}
             editable={false}
           />
         </View>
@@ -134,6 +181,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingVertical: 15,
     alignItems: 'center',
+    marginBottom: 10,
   },
   buttonText: {
     color: '#fff',

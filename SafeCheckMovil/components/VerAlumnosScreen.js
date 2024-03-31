@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, Button } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, Button, Alert } from 'react-native';
+import { registrarLlamadaAtencion } from '../util/AttentionCallsUtil';
 
 const VerAlumnosScreen = ({ route }) => {
   const { alumno } = route.params;
@@ -14,14 +15,31 @@ const VerAlumnosScreen = ({ route }) => {
   const handleCloseModal = () => {
     setModalVisible(false);
     setReporteEnviado(false); // Restablecer el estado de reporte enviado
+    setDescripcion(''); // Limpiar el campo de descripción al cerrar el modal
   };
 
-  const handleSubmitReporte = () => {
-    // Aquí puedes implementar la lógica para enviar el reporte
-    console.log('Reporte enviado:');
-    console.log('Descripción:', descripcion);
-    setModalVisible(false);
-    setReporteEnviado(true);
+  const handleSubmitReporte = async () => {
+    if (descripcion.trim() === '') {
+      Alert.alert('Error', 'La descripción es obligatoria.');
+      return;
+    }
+
+    try {
+      // Enviar datos del formulario para registrar la llamada de atención
+      await registrarLlamadaAtencion({
+        matricula: alumno.matricula,
+        nombreCompleto: `${alumno.nombre} ${alumno.apellido_paterno} ${alumno.apellido_materno}`,
+        grupo: alumno.grupo,
+        descripcion: descripcion,
+      });
+
+      // Cerrar el modal y mostrar mensaje de éxito
+      setModalVisible(false);
+      setReporteEnviado(true);
+    } catch (error) {
+      Alert.alert('Error', 'Hubo un error al registrar la visita. Por favor, inténtalo de nuevo.');
+      console.error(error);
+    }
   };
 
   return (
@@ -60,10 +78,11 @@ const VerAlumnosScreen = ({ route }) => {
           <Text style={styles.infoLabel}>Estado:</Text>
           <Text style={styles.infoValue}>{alumno.estado}</Text>
         </View>
-        <TouchableOpacity onPress={handleReportarAlumno} style={styles.reportButton}>
-          <Text style={styles.reportButtonText}>Reportar Alumno</Text>
-        </TouchableOpacity>
       </View>
+
+      <TouchableOpacity onPress={handleReportarAlumno} style={styles.reportButton}>
+        <Text style={styles.reportButtonText}>Registrar Visita</Text>
+      </TouchableOpacity>
 
       <Modal
         animationType="slide"
@@ -73,7 +92,7 @@ const VerAlumnosScreen = ({ route }) => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalHeader}>Reportar Alumno</Text>
+            <Text style={styles.modalHeader}>Reportar al Alumn(a) {alumno.nombre}</Text>
             <View style={styles.alumnoInfo}>
               <Text style={styles.infoLabel}>Matrícula:</Text>
               <Text style={styles.infoValue}>{alumno.matricula}</Text>
@@ -87,16 +106,16 @@ const VerAlumnosScreen = ({ route }) => {
               <Text style={styles.infoValue}>{alumno.grupo}</Text>
             </View>
             <TextInput
-              style={[styles.descriptionInput, {color: 'black'}]}
+              style={styles.descriptionInput}
               placeholder="Descripción detallada"
               multiline={true}
               numberOfLines={4}
-              onChangeText={text => setDescripcion(text)}
-              placeholderTextColor="black"
+              value={descripcion}
+              onChangeText={setDescripcion}
             />
             <View style={styles.buttonsContainer}>
               <Button title="Cancelar" onPress={handleCloseModal} color="red" />
-              <Button title="Enviar Reporte" onPress={handleSubmitReporte} />
+              <Button title="Enviar" onPress={handleSubmitReporte} />
             </View>
           </View>
         </View>
@@ -109,16 +128,15 @@ const VerAlumnosScreen = ({ route }) => {
         onRequestClose={handleCloseModal}
       >
         <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-        <Text style={styles.modalHeader}>¡Reporte Enviado!</Text>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalHeader}>¡Visita Registrada!</Text>
             <Text style={styles.successText}>
-            El alumno {alumno.nombre} {alumno.apellido_paterno} {alumno.apellido_materno} fue reportado correctamente.
-        </Text>
-        <TouchableOpacity onPress={handleCloseModal} style={styles.closeButton}>
-        <Text style={styles.closeButtonText}>OK</Text>
-        </TouchableOpacity>
-    </View>
-
+              La visita del alumno {alumno.nombre} {alumno.apellido_paterno} {alumno.apellido_materno} ha sido registrada correctamente.
+            </Text>
+            <TouchableOpacity onPress={handleCloseModal} style={styles.closeButton}>
+              <Text style={styles.closeButtonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </Modal>
     </View>
@@ -137,7 +155,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
-    color: 'black', // Texto en negro
+    color: 'black',
   },
   infoContainer: {
     borderRadius: 10,
@@ -161,12 +179,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginRight: 10,
-    color: 'black', // Texto en negro
+    color: 'black',
   },
   infoValue: {
     flex: 1,
     fontSize: 16,
-    color: 'black', // Texto en negro
+    color: 'black',
   },
   reportButton: {
     backgroundColor: 'red',
@@ -196,7 +214,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
-    color: 'black', // Texto en negro
+    color: 'black',
   },
   descriptionInput: {
     borderWidth: 1,
@@ -205,6 +223,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     marginBottom: 20,
+    color: 'black',
   },
   buttonsContainer: {
     flexDirection: 'row',
@@ -214,23 +233,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     marginBottom: 20,
-    color: 'black', // Texto en negro
+    color: 'black',
   },
   alumnoInfo: {
     flexDirection: 'row',
     marginBottom: 10,
-  },
-  descriptionInput: {
-    borderWidth: 1,
-    borderColor: 'black',
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    marginBottom: 20,
-  },
-  buttonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
   },
   closeButton: {
     backgroundColor: 'green',
@@ -239,9 +246,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 25,
-    alignSelf: 'center', // Esto centra el botón horizontalmente en su contenedor
-    marginTop: 20, // Ajusta el margen superior según sea necesario
-  },    
+    alignSelf: 'center',
+    marginTop: 20,
+  },
+  closeButtonText: {
+    color: 'white',
+    fontSize: 16,
+  },
 });
 
 export default VerAlumnosScreen;
