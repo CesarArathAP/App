@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, Button, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, Button, Alert, Platform } from 'react-native';
 import { registrarLlamadaAtencion } from '../util/AttentionCallsUtil';
+import PushNotification from 'react-native-push-notification';
 
 const VerAlumnosScreen = ({ route }) => {
   const { alumno } = route.params;
@@ -36,10 +37,35 @@ const VerAlumnosScreen = ({ route }) => {
       // Cerrar el modal y mostrar mensaje de éxito
       setModalVisible(false);
       setReporteEnviado(true);
+
+      // Enviar notificación
+      enviarNotificacion(alumno);
     } catch (error) {
       Alert.alert('Error', 'Hubo un error al registrar la visita. Por favor, inténtalo de nuevo.');
       console.error(error);
     }
+  };
+
+  const enviarNotificacion = (alumno) => {
+    const channelId = 'default-channel-id';
+
+    PushNotification.createChannel(
+      {
+        channelId,
+        channelName: 'Notificaciones de Reportes',
+        channelDescription: 'Canal para notificaciones de reportes de alumnos',
+        soundName: 'default',
+        importance: 4,
+        vibrate: true,
+      },
+      (created) => console.log(`Channel '${channelId}' created: ${created}`)
+    );
+
+    PushNotification.localNotification({
+      channelId: channelId,
+      title: 'Reporte de Alumno(a)',
+      message: `El alumno(a) ${alumno.nombre} ${alumno.apellido_paterno} con matricula ${alumno.matricula} del grupo ${alumno.grupo} ha sido reportado.`,
+    });
   };
 
   return (
@@ -81,7 +107,7 @@ const VerAlumnosScreen = ({ route }) => {
       </View>
 
       <TouchableOpacity onPress={handleReportarAlumno} style={styles.reportButton}>
-        <Text style={styles.reportButtonText}>Registrar Visita</Text>
+        <Text style={styles.reportButtonText}>Reportar</Text>
       </TouchableOpacity>
 
       <Modal
@@ -129,7 +155,7 @@ const VerAlumnosScreen = ({ route }) => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalHeader}>¡Visita Registrada!</Text>
+            <Text style={styles.modalHeader}>¡Alumno Reportado!</Text>
             <Text style={styles.successText}>
               La visita del alumno {alumno.nombre} {alumno.apellido_paterno} {alumno.apellido_materno} ha sido registrada correctamente.
             </Text>
