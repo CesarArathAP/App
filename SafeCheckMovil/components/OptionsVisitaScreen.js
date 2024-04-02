@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert, Modal, TouchableWithoutFeedback } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import updateVisitaUtil from '../util/UpdateVisitaUtil'; // Importar la función de utilidad
+import PushNotification from 'react-native-push-notification'; // Importar la biblioteca de notificaciones
 
 const OptionsVisitaScreen = ({ route, navigation }) => {
   const [horaSalida, setHoraSalida] = useState('');
@@ -36,6 +37,17 @@ const OptionsVisitaScreen = ({ route, navigation }) => {
   const handleUpdateHoraSalida = async () => {
     try {
       await updateVisitaUtil(route.params.visita.id, horaSalida);
+
+      // Crear mensaje para la notificación
+      const notificationMessage = `Nombre del visita: ${route.params.visita.visitante}\nSu hora de salida fue a las ${horaSalida} horas`;
+
+      // Enviar notificación
+      PushNotification.localNotification({
+        channelId: 'default-channel-id',
+        title: 'La Visita salio de la Universidad',
+        message: notificationMessage,
+      });
+
       Alert.alert('Éxito', 'La hora de salida se actualizó correctamente', [
         { text: 'OK', onPress: () => navigation.navigate('VerVisitas', { refresh: true }) }
       ]);

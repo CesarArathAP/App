@@ -17,6 +17,9 @@ import VisitasScreen from './components/VisitasScreen';
 import VerVisitasScreen from './components/VerVisitasScreen';
 import OptionsVisitaScreen from './components/OptionsVisitaScreen';
 import AlumnosTestScreen from './components/AlumnosTestScreen';
+import Notifications_V_Screen from './components/Notifications_V_Screen';
+import Notification_D_Screen from './components/Notifications_D_Screen';
+import VisitasScreen_D from './components/VisitasScreen_D';
 
 const Stack = createStackNavigator();
 
@@ -41,6 +44,9 @@ export default function App() {
         <Stack.Screen name="VerVisitas" component={VerVisitasScreen} />
         <Stack.Screen name="OptionsVisita" component={OptionsVisitaScreen} />
         <Stack.Screen name="AlumnosTestScreen" component={AlumnosTestScreen} />
+        <Stack.Screen name="Notificaciones" component={Notifications_V_Screen} />
+        <Stack.Screen name="NotifcacionesScreen" component={Notification_D_Screen} />
+        <Stack.Screen name="Visitas" component={VisitasScreen_D} />
       </Stack.Navigator>
     </NavigationContainer>
   );

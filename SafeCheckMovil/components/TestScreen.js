@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { enviarResultadoPrueba } from '../util/TestAlumnosUtil';
+import { registrarLlamadaAtencion } from '../util/AttentionCallsUtil';
+import PushNotification from 'react-native-push-notification';
 
 const TestScreen = ({ route, navigation }) => {
   const { alumno } = route.params;
@@ -8,6 +10,8 @@ const TestScreen = ({ route, navigation }) => {
   const [pruebaEnviada, setPruebaEnviada] = useState(false);
   const [fecha, setFecha] = useState(new Date().toLocaleDateString());
   const [hora, setHora] = useState('');
+  const [conflictoVisible, setConflictoVisible] = useState(false);
+  const [descripcionConflicto, setDescripcionConflicto] = useState('');
 
   useEffect(() => {
     const date = new Date();
@@ -46,6 +50,15 @@ const TestScreen = ({ route, navigation }) => {
       try {
         await enviarResultadoPrueba(formData);
         setPruebaEnviada(true);
+
+        const notificationMessage = `Prueba realizada con éxito para ${alumno.nombre}.`;
+
+        PushNotification.localNotification({
+          channelId: 'default-channel-id',
+          title: 'Prueba Realizada',
+          message: notificationMessage,
+        });
+
         Alert.alert(
           'Prueba Realizada con éxito',
           `La prueba ha sido realizada con éxito para ${alumno.nombre}`,
@@ -60,74 +73,158 @@ const TestScreen = ({ route, navigation }) => {
         );
       }
     }
-  };    
+  };
+
+  const handleConflictoSubmit = async () => {
+    if (descripcionConflicto.trim() === '') {
+      Alert.alert('Campo Vacío', 'Por favor, ingresa la descripción de la situación del alumno.');
+      return;
+    }
+
+    try {
+      await registrarLlamadaAtencion({
+        matricula: alumno.matricula,
+        nombreCompleto: `${alumno.nombre} ${alumno.apellido_paterno} ${alumno.apellido_materno}`,
+        grupo: alumno.grupo,
+        descripcion: descripcionConflicto,
+      });
+
+      const notificationMessage = `Se reportó el comportamiento del alumno ${alumno.nombre}: ${descripcionConflicto}`;
+
+      PushNotification.localNotification({
+        channelId: 'default-channel-id',
+        title: 'Alumnos(a) reportado a la hora de ingresar a la universidad',
+        message: notificationMessage,
+      });
+
+      Alert.alert('Conflicto Reportado', 'Se ha reportado el comportamiento del alumno correctamente.');
+
+      setDescripcionConflicto('');
+      setConflictoVisible(false);
+    } catch (error) {
+      console.error('Error al reportar el conflicto:', error);
+      Alert.alert('Error', 'Hubo un error al reportar el conflicto. Por favor, inténtalo de nuevo.');
+    }
+  };
 
   return (
-    <View style={styles.card}>
-      <View style={styles.cardContent}>
-        <Text style={styles.title}>Realizar Prueba para {alumno.nombre}</Text>
-        <View style={styles.infoContainer}>
-          <Text style={styles.label}>Matrícula:</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.card}>
+        <View style={styles.cardContent}>
+          <Text style={styles.title}>Realizar Prueba para {alumno.nombre}</Text>
+          <View style={styles.infoContainer}>
+            <Text style={styles.label}>Matrícula:</Text>
+            <TextInput
+              style={styles.textInput}
+              value={alumno.matricula}
+              editable={false}
+            />
+          </View>
+          <View style={styles.infoContainer}>
+            <Text style={styles.label}>Nombre:</Text>
+            <TextInput
+              style={styles.textInput}
+              value={`${alumno.nombre} ${alumno.apellido_paterno} ${alumno.apellido_materno}`}
+              editable={false}
+            />
+          </View>
+          <View style={styles.infoContainer}>
+            <Text style={styles.label}>Grupo:</Text>
+            <TextInput
+              style={styles.textInput}
+              value={alumno.grupo}
+              editable={false}
+            />
+          </View>
+          <View style={styles.infoContainer}>
+            <Text style={styles.label}>Fecha:</Text>
+            <TextInput
+              style={styles.textInput}
+              value={fecha}
+              editable={false}
+            />
+          </View>
+          <View style={styles.infoContainer}>
+            <Text style={styles.label}>Hora:</Text>
+            <TextInput
+              style={styles.textInput}
+              value={hora}
+              editable={false}
+            />
+          </View>
           <TextInput
-            style={styles.textInput}
-            value={alumno.matricula}
-            editable={false}
+            style={styles.input}
+            placeholder="Ingresar resultado de la prueba"
+            onChangeText={handleInputChange}
+            value={resultado}
+            keyboardType="numeric"
+            placeholderTextColor="#666"
           />
+          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+            <Text style={styles.buttonText}>Enviar Resultado</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => setConflictoVisible(true)}>
+            <Text style={styles.buttonText}>Reportar Conflicto</Text>
+          </TouchableOpacity>
         </View>
-        <View style={styles.infoContainer}>
-          <Text style={styles.label}>Nombre:</Text>
-          <TextInput
-            style={styles.textInput}
-            value={`${alumno.nombre} ${alumno.apellido_paterno} ${alumno.apellido_materno}`}
-            editable={false}
-          />
-        </View>
-        <View style={styles.infoContainer}>
-          <Text style={styles.label}>Grupo:</Text>
-          <TextInput
-            style={styles.textInput}
-            value={alumno.grupo}
-            editable={false}
-          />
-        </View>
-        <View style={styles.infoContainer}>
-          <Text style={styles.label}>Fecha:</Text>
-          <TextInput
-            style={styles.textInput}
-            value={fecha}
-            editable={false}
-          />
-        </View>
-        <View style={styles.infoContainer}>
-          <Text style={styles.label}>Hora:</Text>
-          <TextInput
-            style={styles.textInput}
-            value={hora}
-            editable={false}
-          />
-        </View>
-        <TextInput
-          style={styles.input}
-          placeholder="Ingresar resultado de la prueba"
-          onChangeText={handleInputChange}
-          value={resultado}
-          keyboardType="numeric"
-          placeholderTextColor="#666"
-        />
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>Enviar Resultado</Text>
-        </TouchableOpacity>
       </View>
+
+      {conflictoVisible && (
+        <View style={styles.card}>
+          <View style={styles.cardContent}>
+            <Text style={styles.title}>Reportar Comportamiento de {alumno.nombre}</Text>
+            <View style={styles.infoContainer}>
+              <Text style={styles.label}>Matrícula:</Text>
+              <TextInput
+                style={styles.textInput}
+                value={alumno.matricula}
+                editable={false}
+              />
+            </View>
+            <View style={styles.infoContainer}>
+              <Text style={styles.label}>Nombre:</Text>
+              <TextInput
+                style={styles.textInput}
+                value={`${alumno.nombre} ${alumno.apellido_paterno} ${alumno.apellido_materno}`}
+                editable={false}
+              />
+            </View>
+            <View style={styles.infoContainer}>
+              <Text style={styles.label}>Grupo:</Text>
+              <TextInput
+                style={styles.textInput}
+                value={alumno.grupo}
+                editable={false}
+              />
+            </View>
+            <TextInput
+              style={styles.input}
+              placeholder="Descripción del conflicto"
+              onChangeText={(text) => setDescripcionConflicto(text)}
+              value={descripcionConflicto}
+              placeholderTextColor="#666"
+            />
+            <TouchableOpacity style={styles.button} onPress={handleConflictoSubmit}>
+              <Text style={styles.buttonText}>Reportar Comportamiento</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
       {pruebaEnviada && (
         <View style={styles.successMessage}>
           <Text style={styles.successText}>Prueba Realizada con éxito para {alumno.nombre}</Text>
         </View>
       )}
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+    padding: 20,
+  },
   card: {
     backgroundColor: '#f9f9f9',
     borderRadius: 10,

@@ -3,6 +3,7 @@ import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Image, Ale
 import { Card } from 'react-native-elements';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { launchImageLibrary } from 'react-native-image-picker';
+import PushNotification from 'react-native-push-notification'; // Importa la biblioteca de notificaciones
 import registrarVisita from '../util/RegistrarVisitas';
 
 const getCurrentTime = () => {
@@ -30,7 +31,7 @@ const VisitasScreen = () => {
       Alert.alert('Error', 'Todos los campos son obligatorios, incluyendo la foto de identificación');
       return;
     }
-
+  
     try {
       const datosVisita = {
         visitante: visitante,
@@ -41,9 +42,20 @@ const VisitasScreen = () => {
         hora_salida: horaSalida,
         fotografia: `data:image/jpeg;base64,${foto}` // Agregar "data:image/jpeg;base64," a la cadena de la imagen base64
       };
-
+  
       await registrarVisita(datosVisita);
-
+  
+      // Formatea los datos para incluir en el mensaje de la notificación
+      const notificationMessage = `Nombre del visitante: ${visitante}\nMotivo de la visita: ${motivo}\nHora de entrada: ${horaEntrada}`;
+  
+      // Envía una notificación cuando se registra una visita
+      PushNotification.localNotification({
+        channelId: 'default-channel-id',
+        title: 'Ingreso una Visita a la Universidad',
+        message: notificationMessage,
+        largeIcon: foto, // Utiliza la imagen como ícono grande de la notificación
+      });
+  
       // Limpiar el formulario después de enviar los datos
       setVisitante('');
       setMotivo('');
@@ -52,13 +64,13 @@ const VisitasScreen = () => {
       setHoraEntrada(getCurrentTime());
       setHoraSalida('');
       setFoto('');
-
+  
       Alert.alert('Éxito', 'La visita ha sido registrada exitosamente');
     } catch (error) {
       console.error('Error al registrar la visita:', error.message);
       Alert.alert('Error', 'Ha ocurrido un error al registrar la visita');
     }
-  }; 
+  };  
 
   const onChangeDate = (event, selectedDate) => {
     const currentDate = selectedDate || fecha;
@@ -66,7 +78,6 @@ const VisitasScreen = () => {
     setFecha(currentDate);
   };
 
-  // Función para manejar la selección de la imagen
   const handleChoosePhoto = () => {
     const options = {
       mediaType: 'photo',

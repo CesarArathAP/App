@@ -7,6 +7,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:321740150095:android:275622b6ec4ed2c087213a",
+        "android_client_info": {
+          "package_name": "com.safecheckmovil"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDLWeY2Mceu_hJj22Fcuf2yyjqJrFBsio"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:321740150095:android:3e31654e7cd3913387213a",
         "android_client_info": {
           "package_name": "com.safecheckschool"

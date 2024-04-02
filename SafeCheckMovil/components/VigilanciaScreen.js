@@ -22,6 +22,14 @@ const VigilanciaScreen = ({ route }) => {
     navigation.navigate('AlumnosTestScreen')
   }
 
+  const Notifications_V_Screen = () => {
+    navigation.navigate('Notificaciones')
+  }
+
+  const Home = () => {
+    navigation.navigate('Home')
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -42,10 +50,10 @@ const VigilanciaScreen = ({ route }) => {
           <TouchableOpacity style={styles.option} onPress={VerAlumnosTest}>
             <Text style={styles.optionText}>Test de Alumnos</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.option}>
+          <TouchableOpacity style={styles.option} onPress={Notifications_V_Screen}>
             <Text style={styles.optionText}>Notificaciones</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.option}>
+          <TouchableOpacity style={styles.option} onPress={Home}>
             <Text style={styles.optionText}>Salir</Text>
           </TouchableOpacity>
         </View>

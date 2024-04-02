@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import Especialidades from './Especialidades';
 
 const DocenteScreen = ({ route }) => {
-  const { nombreCompleto, carreras } = route.params; // Obtener nombreCompleto y carreras de route.params
+  const { nombreCompleto, carreras } = route.params;
   const navigation = useNavigation();
   const [expandedCarreraIndex, setExpandedCarreraIndex] = useState(null);
 
@@ -16,6 +16,18 @@ const DocenteScreen = ({ route }) => {
     setExpandedCarreraIndex(index === expandedCarreraIndex ? null : index);
   };
 
+  const navigateToNotificaciones = () => {
+    navigation.navigate('Notificaciones'); // Navegar a la pantalla 'Notificaciones'
+  };
+
+  const navigateToHome = () => {
+    navigation.reset({ routes: [{ name: 'Home' }] }); // Regresar a la pantalla de inicio
+  };
+
+  const Visitas = () => {
+    navigation.navigate('Visitas')
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -25,13 +37,13 @@ const DocenteScreen = ({ route }) => {
         </View>
       </View>
       <View style={styles.menu}>
-        <TouchableOpacity style={styles.option} onPress={() => {}}>
+      <TouchableOpacity style={styles.option} onPress={Visitas}>
           <Text style={styles.optionText}>Visitas</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.option} onPress={() => {}}>
+        <TouchableOpacity style={styles.option} onPress={navigateToNotificaciones}>
           <Text style={styles.optionText}>Notificaciones</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.option} onPress={() => navigation.reset({ routes: [{ name: 'Home' }] })}>
+        <TouchableOpacity style={styles.option} onPress={navigateToHome}>
           <Text style={styles.optionText}>Salir</Text>
         </TouchableOpacity>
       </View>
@@ -61,10 +73,10 @@ const DocenteScreen = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa', // Bootstrap background color
+    backgroundColor: '#f8f9fa',
   },
   carreraText: {
-    color: 'black', // Color del texto en negro
+    color: 'black',
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -74,7 +86,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   header: {
-    backgroundColor: '#007bff', // Bootstrap primary color
+    backgroundColor: '#007bff',
   },
   headerContent: {
     flexDirection: 'row',
@@ -87,23 +99,23 @@ const styles = StyleSheet.create({
     height: 24,
   },
   welcomeText: {
-    fontSize: 20, // Tamaño de fuente ajustado
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#fff', // Text color
+    color: '#fff',
   },
   menu: {
     flexDirection: 'row',
     marginBottom: 15,
     justifyContent: 'space-around',
     padding: 10,
-    backgroundColor: '#dee2e6', // Background color for menu
+    backgroundColor: '#dee2e6',
   },
   option: {
     padding: 10,
   },
   optionText: {
     fontSize: 14,
-    color: '#495057', // Text color for options
+    color: '#495057',
   },
   body: {
     flex: 1,
