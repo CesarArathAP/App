@@ -3,6 +3,7 @@ import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ScrollView 
 import { enviarResultadoPrueba } from '../util/TestAlumnosUtil';
 import { registrarLlamadaAtencion } from '../util/AttentionCallsUtil';
 import PushNotification from 'react-native-push-notification';
+import notificationsApi from '../api/notificationsApi';
 
 const TestScreen = ({ route, navigation }) => {
   const { alumno } = route.params;
@@ -53,6 +54,8 @@ const TestScreen = ({ route, navigation }) => {
 
         const notificationMessage = `Prueba realizada con éxito para ${alumno.nombre}.`;
 
+        await notificationsApi.sendNotification('Resultado de Test', notificationMessage);
+
         PushNotification.localNotification({
           channelId: 'default-channel-id',
           title: 'Prueba Realizada',
@@ -90,6 +93,8 @@ const TestScreen = ({ route, navigation }) => {
       });
 
       const notificationMessage = `Se reportó el comportamiento del alumno ${alumno.nombre}: ${descripcionConflicto}`;
+
+      await notificationsApi.sendNotification('Comportamiento inapropiado',notificationMessage);
 
       PushNotification.localNotification({
         channelId: 'default-channel-id',

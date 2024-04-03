@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList, ActivityIndicator, Image, Modal, Button } from 'react-native';
 import obtenerVisitas from '../util/ObtenerVisitasController';
 import PushNotification from 'react-native-push-notification';
+import notificationsApi from '../api/notificationsApi';
 
 const VisitasScreen_D = () => {
   const [visitas, setVisitas] = useState([]);
@@ -49,14 +50,22 @@ const VisitasScreen_D = () => {
     setReportDescription('');
   };
 
-  const sendNotification = () => {
-    PushNotification.localNotification({
-      channelId: 'default-channel-id',
-      title: 'Visita Reportada',
-      message: `${selectedVisita.visitante} como visita a la Universidad ha sido reportada por ${reportDescription}`,
-      smallIcon: 'ic_notification',
-    });
-  };
+  const sendNotification = async () => {
+    try {
+      // Enviar notificación local
+      PushNotification.localNotification({
+        channelId: 'default-channel-id',
+        title: 'Visita Reportada',
+        message: `${selectedVisita.visitante} como visita a la Universidad ha sido reportada por ${reportDescription}`,
+        smallIcon: 'ic_notification',
+      });
+  
+      // Enviar notificación a la API
+      await notificationsApi.sendNotification('Visita Reportada', `${selectedVisita.visitante} como visita a la Universidad ha sido reportada por ${reportDescription}`);
+    } catch (error) {
+      console.error('Error al enviar notificación a la API:', error.message);
+    }
+  };  
 
   const filteredVisitas = visitas.filter((visita) => {
     return (

@@ -5,6 +5,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { launchImageLibrary } from 'react-native-image-picker';
 import PushNotification from 'react-native-push-notification'; // Importa la biblioteca de notificaciones
 import registrarVisita from '../util/RegistrarVisitas';
+import notificationsApi from '../api/notificationsApi';
 
 const getCurrentTime = () => {
   const now = new Date();
@@ -55,6 +56,9 @@ const VisitasScreen = () => {
         message: notificationMessage,
         largeIcon: foto, // Utiliza la imagen como ícono grande de la notificación
       });
+
+      // Envía la notificación a la API
+    await notificationsApi.sendNotification('Ingreso una Visita a la Universidad', notificationMessage);
   
       // Limpiar el formulario después de enviar los datos
       setVisitante('');

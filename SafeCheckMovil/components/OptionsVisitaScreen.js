@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert, Mod
 import DateTimePicker from '@react-native-community/datetimepicker';
 import updateVisitaUtil from '../util/UpdateVisitaUtil'; // Importar la función de utilidad
 import PushNotification from 'react-native-push-notification'; // Importar la biblioteca de notificaciones
+import notificationsApi from '../api/notificationsApi';
 
 const OptionsVisitaScreen = ({ route, navigation }) => {
   const [horaSalida, setHoraSalida] = useState('');
@@ -36,18 +37,22 @@ const OptionsVisitaScreen = ({ route, navigation }) => {
 
   const handleUpdateHoraSalida = async () => {
     try {
+      // Actualiza la hora de salida de la visita
       await updateVisitaUtil(route.params.visita.id, horaSalida);
-
+  
       // Crear mensaje para la notificación
       const notificationMessage = `Nombre del visita: ${route.params.visita.visitante}\nSu hora de salida fue a las ${horaSalida} horas`;
-
+  
       // Enviar notificación
       PushNotification.localNotification({
         channelId: 'default-channel-id',
-        title: 'La Visita salio de la Universidad',
+        title: 'La Visita salió de la Universidad',
         message: notificationMessage,
       });
-
+  
+      // Envía la notificación a la API
+      await notificationsApi.sendNotification('La Visita salió de la Universidad', notificationMessage);
+  
       Alert.alert('Éxito', 'La hora de salida se actualizó correctamente', [
         { text: 'OK', onPress: () => navigation.navigate('VerVisitas', { refresh: true }) }
       ]);
@@ -55,7 +60,7 @@ const OptionsVisitaScreen = ({ route, navigation }) => {
       console.error('Error al actualizar la visita:', error);
       Alert.alert('Error', 'Ocurrió un error al actualizar la visita');
     }
-  };
+  };  
 
   return (
     <ScrollView contentContainerStyle={styles.scrollView}>

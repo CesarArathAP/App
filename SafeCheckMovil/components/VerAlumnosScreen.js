@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, Button, Alert, Platform } from 'react-native';
 import { registrarLlamadaAtencion } from '../util/AttentionCallsUtil';
 import PushNotification from 'react-native-push-notification';
+import notificationsApi from '../api/notificationsApi';
 
 const VerAlumnosScreen = ({ route }) => {
   const { alumno } = route.params;
@@ -24,7 +25,7 @@ const VerAlumnosScreen = ({ route }) => {
       Alert.alert('Error', 'La descripción es obligatoria.');
       return;
     }
-
+  
     try {
       // Enviar datos del formulario para registrar la llamada de atención
       await registrarLlamadaAtencion({
@@ -33,22 +34,22 @@ const VerAlumnosScreen = ({ route }) => {
         grupo: alumno.grupo,
         descripcion: descripcion,
       });
-
+  
+      // Enviar notificación a la API y mostrarla localmente
+      enviarNotificacion(alumno, descripcion);
+  
       // Cerrar el modal y mostrar mensaje de éxito
       setModalVisible(false);
       setReporteEnviado(true);
-
-      // Enviar notificación
-      enviarNotificacion(alumno);
     } catch (error) {
       Alert.alert('Error', 'Hubo un error al registrar la visita. Por favor, inténtalo de nuevo.');
       console.error(error);
     }
   };
-
-  const enviarNotificacion = (alumno) => {
+  
+  const enviarNotificacion = async (alumno, descripcion) => {
     const channelId = 'default-channel-id';
-
+  
     PushNotification.createChannel(
       {
         channelId,
@@ -60,12 +61,20 @@ const VerAlumnosScreen = ({ route }) => {
       },
       (created) => console.log(`Channel '${channelId}' created: ${created}`)
     );
-
-    PushNotification.localNotification({
-      channelId: channelId,
-      title: 'Reporte de Alumno(a)',
-      message: `El alumno(a) ${alumno.nombre} ${alumno.apellido_paterno} con matricula ${alumno.matricula} del grupo ${alumno.grupo} ha sido reportado.`,
-    });
+  
+    try {
+      // Enviar notificación a la API
+      await notificationsApi.sendNotification('Reporte de Alumno(a)', `El alumno(a) ${alumno.nombre} ${alumno.apellido_paterno} con matrícula ${alumno.matricula} del grupo ${alumno.grupo} ha sido reportado por ${descripcion}`);
+      
+      // Mostrar notificación localmente en el dispositivo móvil
+      PushNotification.localNotification({
+        channelId: channelId,
+        title: 'Reporte de Alumno(a)',
+        message: `El alumno(a) ${alumno.nombre} ${alumno.apellido_paterno} con matrícula ${alumno.matricula} del grupo ${alumno.grupo} ha sido reportado por ${descripcion}`,
+      });
+    } catch (error) {
+      console.error('Error al enviar o mostrar la notificación:', error);
+    }
   };
 
   return (
