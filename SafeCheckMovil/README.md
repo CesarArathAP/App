@@ -6,44 +6,52 @@ Este es un archivo `package.json` que describe las dependencias del proyecto Saf
 ## Dependencias
 
 ### Dependencias de Producción
-- **@notifee/react-native:** ^7.8.2
-- **@react-native-async-storage/async-storage:** ^1.23.1
-- **@react-native-community/datetimepicker:** ^7.6.3
-- **@react-native-firebase/app:** ^19.1.1
-- **@react-native-firebase/messaging:** ^19.1.1
-- **@react-navigation/stack:** ^6.3.29
-- **axios:** ^1.6.8
-- **notifee:** ^0.0.1
-- **react:** 18.2.0
-- **react-native:** ^0.73.6
-- **react-native-chart-kit:** ^6.12.0
-- **react-native-elements:** ^3.4.3
-- **react-native-fs:** ^2.20.0
-- **react-native-gesture-handler:** ^2.16.0
-- **react-native-image-picker:** ^7.1.2
-- **react-native-push-notification:** ^8.1.1
-- **react-native-safe-area-context:** ^4.9.0
-- **react-native-screens:** ^3.30.1
-- **react-native-svg:** ^15.1.0
-- **vector-icons:** ^0.1.0
+
+| Dependencia                                     | Comando para Descargar        |
+|-------------------------------------------------|-------------------------------|
+| @notifee/react-native                           | `npm install @notifee/react-native` |
+| @react-native-async-storage/async-storage       | `npm install @react-native-async-storage/async-storage` |
+| @react-native-community/datetimepicker           | `npm install @react-native-community/datetimepicker` |
+| @react-native-firebase/app                       | `npm install @react-native-firebase/app` |
+| @react-native-firebase/messaging                 | `npm install @react-native-firebase/messaging` |
+| @react-navigation/stack                         | `npm install @react-navigation/stack` |
+| axios                                           | `npm install axios` |
+| notifee                                         | `npm install notifee` |
+| react                                           | `npm install react` |
+| react-native                                    | `npm install react-native` |
+| react-native-chart-kit                          | `npm install react-native-chart-kit` |
+| react-native-elements                           | `npm install react-native-elements` |
+| react-native-fs                                 | `npm install react-native-fs` |
+| react-native-gesture-handler                    | `npm install react-native-gesture-handler` |
+| react-native-image-picker                       | `npm install react-native-image-picker` |
+| react-native-push-notification                  | `npm install react-native-push-notification` |
+| react-native-safe-area-context                  | `npm install react-native-safe-area-context` |
+| react-native-screens                            | `npm install react-native-screens` |
+| react-native-svg                                | `npm install react-native-svg` |
+| vector-icons                                    | `npm install vector-icons` |
 
 ### Dependencias de Desarrollo
-- **@babel/core:** ^7.20.0
-- **@babel/preset-env:** ^7.20.0
-- **@babel/runtime:** ^7.20.0
-- **@react-native/babel-preset:** 0.73.21
-- **@react-native/eslint-config:** 0.73.2
-- **@react-native/metro-config:** 0.73.5
-- **@react-native/typescript-config:** 0.73.1
-- **@types/react:** ^18.2.6
-- **@types/react-test-renderer:** ^18.0.0
-- **babel-jest:** ^29.6.3
-- **eslint:** ^8.19.0
-- **jest:** ^29.6.3
-- **metro:** ^0.80.8
-- **prettier:** 2.8.8
-- **react-test-renderer:** 18.2.0
-- **typescript:** 5.0.4
+
+Nota: Las Depencias de desarrolo no hacen falta que las decargue por que instalan cuando ejecutas el comando npm install
+
+| Dependencia                                     | Comando para Descargar        |
+|-------------------------------------------------|-------------------------------|
+| @babel/core                                     | `npm install @babel/core` |
+| @babel/preset-env                               | `npm install @babel/preset-env` |
+| @babel/runtime                                  | `npm install @babel/runtime` |
+| @react-native/babel-preset                      | `npm install @react-native/babel-preset` |
+| @react-native/eslint-config                     | `npm install @react-native/eslint-config` |
+| @react-native/metro-config                      | `npm install @react-native/metro-config` |
+| @react-native/typescript-config                 | `npm install @react-native/typescript-config` |
+| @types/react                                    | `npm install @types/react` |
+| @types/react-test-renderer                      | `npm install @types/react-test-renderer` |
+| babel-jest                                      | `npm install babel-jest` |
+| eslint                                          | `npm install eslint` |
+| jest                                            | `npm install jest` |
+| metro                                           | `npm install metro` |
+| prettier                                        | `npm install prettier` |
+| react-test-renderer                            | `npm install react-test-renderer` |
+| typescript                                     | `npm install typescript` |
 
 ## Comando para Descargar Todas las Dependencias
 Para instalar todas las dependencias del proyecto, ejecuta el siguiente comando en la terminal:
