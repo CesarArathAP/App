@@ -32,7 +32,7 @@ Este es un archivo `package.json` que describe las dependencias del proyecto Saf
 
 ### Dependencias de Desarrollo
 
-Nota: Las Depencias de desarrolo no hacen falta que las decargue por que instalan cuando ejecutas el comando npm install
+Nota: Las Depencias de desarrollo no hacen falta que las decargue por que se instalan cuando ejecutas el comando npm install.
 
 | Dependencia                                     | Comando para Descargar        |
 |-------------------------------------------------|-------------------------------|
