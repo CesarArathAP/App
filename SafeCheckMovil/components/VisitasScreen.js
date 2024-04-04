@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Image, Alert, ScrollView } from 'react-native';
 import { Card } from 'react-native-elements';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { launchImageLibrary } from 'react-native-image-picker';
-import PushNotification from 'react-native-push-notification'; // Importa la biblioteca de notificaciones
+import PushNotification from 'react-native-push-notification';
 import registrarVisita from '../util/RegistrarVisitas';
 import notificationsApi from '../api/notificationsApi';
 
@@ -22,10 +22,17 @@ const VisitasScreen = () => {
   const [area, setArea] = useState('');
   const [fecha, setFecha] = useState(new Date());
   const [horaEntrada, setHoraEntrada] = useState(getCurrentTime());
-  const [horaSalida, setHoraSalida] = useState('');
+  const [horaSalida, setHoraSalida] = useState('Pendiente');
   const [foto, setFoto] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
+
+  useEffect(() => {
+    // Establecer la fecha y hora actual cuando el componente se monte
+    const now = new Date();
+    setFecha(now);
+    setHoraEntrada(getCurrentTime());
+  }, []);
 
   const handleSubmit = async () => {
     if (!visitante || !motivo || !area || !fecha || !horaEntrada || !foto) {
@@ -58,7 +65,7 @@ const VisitasScreen = () => {
       });
 
       // Envía la notificación a la API
-    await notificationsApi.sendNotification('Ingreso una Visita a la Universidad', notificationMessage);
+      await notificationsApi.sendNotification('Ingreso una Visita a la Universidad', notificationMessage);
   
       // Limpiar el formulario después de enviar los datos
       setVisitante('');
@@ -66,7 +73,7 @@ const VisitasScreen = () => {
       setArea('');
       setFecha(new Date());
       setHoraEntrada(getCurrentTime());
-      setHoraSalida('');
+      setHoraSalida('Pendiente');
       setFoto('');
   
       Alert.alert('Éxito', 'La visita ha sido registrada exitosamente');
@@ -123,7 +130,7 @@ const VisitasScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Card containerStyle={styles.card}>
         <Text style={styles.title}>Registrar Visita</Text>
         <TextInput style={styles.input} placeholder="Nombre del visitante" placeholderTextColor="#ccc" value={visitante} onChangeText={setVisitante} />
@@ -153,21 +160,34 @@ const VisitasScreen = () => {
             onChange={onChangeTime}
           />
         )}
-        <TextInput style={styles.input} placeholder="Hora de salida" placeholderTextColor="#ccc" value={horaSalida} onChangeText={setHoraSalida} />
-        {foto !== '' && (
-          <Image source={{ uri: `data:image/jpeg;base64,${foto}` }} style={styles.image} />
+        <TextInput style={styles.input} placeholder="Hora de salida" placeholderTextColor="#ccc" value={horaSalida} editable={false} />
+        {foto !== '' ? (
+          <TouchableOpacity onPress={handleChoosePhoto}>
+            <Image source={{ uri: `data:image/jpeg;base64,${foto}` }} style={styles.image} />
+            <Text style={styles.textSelect}>Seleccionar la fotografía de la identificación de la visita</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={handleChoosePhoto}>
+            <Image source={require('../assets/images/tarjeta-de-identificacion.png')} style={styles.defaultImage} />
+            <Text style={styles.textSelect}>Seleccionar la fotografía de la identificación de la visita</Text>
+          </TouchableOpacity>
         )}
-
-        <Button title="Seleccionar Foto" onPress={handleChoosePhoto} />
-        <Button title="Registrar Visita" onPress={handleSubmit} />
+        {foto !== '' && (
+          <TouchableOpacity onPress={handleChoosePhoto}>
+            <Text style={styles.changePhotoButton}>Cambiar Fotografía</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity style={styles.registerButton} onPress={handleSubmit}>
+          <Text style={styles.buttonText}>Registrar Visita</Text>
+        </TouchableOpacity>
       </Card>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#f0f0f0',
@@ -198,7 +218,43 @@ const styles = StyleSheet.create({
     height: 200,
     resizeMode: 'contain',
     marginBottom: 10,
+    alignSelf: 'center', // Alineación horizontal
+    justifyContent: 'center', // Alineación vertical
   },
+  defaultImage: {
+    width: 150,
+    height: 100,
+    resizeMode: 'contain',
+    marginBottom: 10,
+    alignSelf: 'center', // Alineación horizontal
+    justifyContent: 'center', // Alineación vertical
+  },  
+  registerButton: {
+    backgroundColor: 'blue',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 15,
+    fontWeight: 'bold',
+    textAlign: 'center'
+  },
+  textSelect: {
+    fontSize: 15,
+    marginBottom: 10,
+    color: 'black',
+    textAlign: 'center'
+  },
+  changePhotoButton: {
+    fontSize: 15,
+    color: 'blue',
+    textAlign: 'center',
+    marginTop: 10,
+  }
 });
 
 export default VisitasScreen;

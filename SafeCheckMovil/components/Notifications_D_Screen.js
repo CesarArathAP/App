@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import PushNotification from 'react-native-push-notification';
 
 const Notification_D_Screen = () => {
@@ -30,7 +30,8 @@ const Notification_D_Screen = () => {
 
   const handleOk = (notificationId) => {
     console.log(`Notificación con ID ${notificationId} marcada como OK`);
-    // Aquí puedes realizar cualquier acción adicional
+    // Mostrar alerta al presionar OK
+    showAlert();
   };
 
   const handleDelete = (notificationId) => {
@@ -41,6 +42,16 @@ const Notification_D_Screen = () => {
 
     // Actualizar el estado eliminando la notificación
     setNotifications(prevNotifications => prevNotifications.filter(notification => notification.id !== notificationId));
+  };
+
+  const showAlert = () => {
+    Alert.alert(
+      'Seguimiento de advertencia',
+      'Ya se está dando seguimiento a su advertencia.',
+      [
+        { text: 'Cerrar', onPress: () => console.log('Alert closed') }
+      ]
+    );
   };
 
   return (
@@ -89,11 +100,11 @@ const styles = StyleSheet.create({
   },
   notificationItem: {
     borderWidth: 1,
-    borderColor: '#cccccc',
+    borderColor: '#ced4da',
     borderRadius: 5,
     padding: 10,
     marginBottom: 10,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#f8f9fa',
   },
   notificationTitle: {
     fontSize: 16,
@@ -119,10 +130,10 @@ const styles = StyleSheet.create({
     minWidth: 80,
   },
   okButton: {
-    backgroundColor: 'green',
+    backgroundColor: '#28a745',
   },
   deleteButton: {
-    backgroundColor: 'red',
+    backgroundColor: '#dc3545',
   },
   buttonText: {
     color: 'white',

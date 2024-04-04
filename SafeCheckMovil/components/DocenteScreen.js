@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, LayoutAnimation } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, LayoutAnimation, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Especialidades from './Especialidades';
 
@@ -25,8 +25,8 @@ const DocenteScreen = ({ route }) => {
   };
 
   const Visitas = () => {
-    navigation.navigate('Visitas')
-  }
+    navigation.navigate('Visitas');
+  };
 
   return (
     <View style={styles.container}>
@@ -37,7 +37,7 @@ const DocenteScreen = ({ route }) => {
         </View>
       </View>
       <View style={styles.menu}>
-      <TouchableOpacity style={styles.option} onPress={Visitas}>
+        <TouchableOpacity style={styles.option} onPress={Visitas}>
           <Text style={styles.optionText}>Visitas</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.option} onPress={navigateToNotificaciones}>
@@ -47,25 +47,59 @@ const DocenteScreen = ({ route }) => {
           <Text style={styles.optionText}>Salir</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.body}>
-        {carreras ? (
-          carreras.map((carrera, index) => (
-            <View key={index} style={styles.card}>
-              <TouchableOpacity onPress={() => toggleCarreraExpansion(index)}>
-                <View style={styles.headerCard}>
-                  <Text style={styles.carreraText}>{carrera.nombreCarrera}</Text>
-                  <Text style={styles.directorText}>{carrera.directorCarrera}</Text>
+      <Text style={styles.instructionsTitle}>Carreras a la que imparte clase como Docente:</Text>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.body}>
+          {carreras ? (
+            <>
+              {carreras.map((carrera, index) => (
+                <View key={index} style={styles.card}>
+                  <TouchableOpacity onPress={() => toggleCarreraExpansion(index)}>
+                    <View style={styles.headerCard}>
+                      <Text style={styles.carreraText}>{carrera.nombreCarrera}</Text>
+                      <Text style={styles.directorText}>{carrera.directorCarrera}</Text>
+                    </View>
+                    {expandedCarreraIndex === index && (
+                      <Especialidades especialidades={carrera.especialidades} />
+                    )}
+                  </TouchableOpacity>
                 </View>
-                {expandedCarreraIndex === index && (
-                  <Especialidades especialidades={carrera.especialidades} />
-                )}
-              </TouchableOpacity>
-            </View>
-          ))
-        ) : (
-          <Text style={styles.carreraText}>No se han encontrado carreras</Text>
-        )}
-      </View>
+              ))}
+              <View style={styles.instructionsAndAdditionalContainer}>
+                <View style={styles.instructionsContainer}>
+                  <Text style={styles.instructionsTitle}>Instrucciones:</Text>
+                  <Text style={styles.instructionsText}>
+                    - Presiona sobre una carrera para expandir o contraer detalles.
+                  </Text>
+                  <Text style={styles.instructionsText}>
+                    - Usa los botones en el menú para poder buscar a cualquier alumno por su nombre, matricula y/o grupo.
+                  </Text>
+                </View>
+                <View style={styles.additionalContainer}>
+                  <Text style={styles.additionalTitle}>Reportar Comportamiento Inaceptable:</Text>
+                  <Text style={styles.additionalText}>
+                    - Si observas a un alumno o alumna con un comportamiento inaceptable o sospechoso, como estar alcoholizado o en posesión de sustancias prohibidas, notifica a las autoridades de la institución de inmediato.
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.instructionsAndAdditionalContainer}>
+                <View style={styles.additionalContainer}>
+                  <Text style={styles.additionalText}>
+                     Si un alumno muestra agresividad hacia otros estudiantes o personal docente, sigue los procedimientos establecidos por la institución para garantizar la seguridad de todos.
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.instructionsAndAdditionalContainer}>
+                <View style={styles.additionalContainer}>
+                <Image source={require('../assets/images/logo.png')} style={styles.Imagen} />
+                </View>
+              </View>
+            </>
+          ) : (
+            <Text style={styles.carreraText}>No se han encontrado carreras</Text>
+          )}
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -118,7 +152,6 @@ const styles = StyleSheet.create({
     color: '#495057',
   },
   body: {
-    flex: 1,
     paddingHorizontal: 20,
     paddingTop: 10,
   },
@@ -133,7 +166,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
-    marginBottom: 15,
+    marginBottom: 10,
     padding: 15,
     width: '100%',
   },
@@ -143,6 +176,59 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
+  instructionsAndAdditionalContainer: {
+    flexDirection: 'row',
+    marginTop: 10,
+    marginBottom: 10
+  },
+  Text: {
+    flexDirection: 'row',
+    marginTop: 10,
+    marginBottom: 10
+  },
+  instructionsContainer: {
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 8,
+    marginRight: 10,
+    flex: 1,
+  },
+  additionalContainer: {
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 8,
+    flex: 1,
+  },
+  instructionsTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#495057',
+    marginBottom: 10,
+  },
+  instructionsText: {
+    fontSize: 14,
+    color: '#495057',
+    marginBottom: 5,
+  },
+  additionalTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#495057',
+    marginBottom: 10,
+  },
+  additionalText: {
+    fontSize: 14,
+    color: '#495057',
+    marginBottom: 5,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  Imagen: {
+    paddingStart: 'auto',
+    width: 350,
+    height: 350
+  }
 });
 
 export default DocenteScreen;
