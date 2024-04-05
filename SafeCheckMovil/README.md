@@ -59,3 +59,63 @@ Para instalar todas las dependencias del proyecto, ejecuta el siguiente comando 
 
 ```bash
 npm install
+
+```
+
+## Configuración Bluetooth para conecetar el Lector QR con la aplicación
+
+### Paso 1
+
+Descargar la depencia de bluetooth-serial en el proyecto
+
+```bash
+npm install react-native-bluetooth-serial
+```
+
+### Dirigete a tu carpeta node_modules en la dirección:
+
+`node_modules/react-native-bluetooth-serial/android/app/build.gradle`
+
+asegurandote de que el archivo se vea de esta forma
+
+```bash
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.1.0'
+    }
+}
+
+apply plugin: 'com.android.library'
+// !IMPORTANTE¡
+android {
+    compileSdkVersion 31  // Asegúrate de que la versión del SDK de compilación sea al menos 30
+    buildToolsVersion "33.0.1"  // Actualiza la versión de Android SDK Build Tools a una compatible
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 31  // Asegúrate de que la versión de destino del SDK sea al menos 30
+        versionCode 1
+        versionName "1.0"
+        ndk {
+            abiFilters "armeabi-v7a", "x86"
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+        url "$rootDir/../node_modules/react-native/android"
+    }
+}
+
+dependencies {
+    implementation 'com.facebook.react:react-native:+'
+}
+
+```
