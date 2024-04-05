@@ -64,7 +64,7 @@ npm install
 
 ## Configuración Bluetooth para conecetar el Lector QR con la aplicación
 
-### Paso 1
+# Paso 1
 
 Descargar la depencia de bluetooth-serial en el proyecto
 
@@ -119,3 +119,41 @@ dependencies {
 }
 
 ```
+
+# Paso 2
+
+En la dirección `node_modules/react-native-bluetooth-serial/android/src/main/java/RCTBluetoothSerialPackage.java`
+
+asegurate de tener el archvio RCTBluetoothSerialPackage.java de esta froma
+
+```bash
+package com.rusel.RCTBluetoothSerial;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import com.facebook.react.ReactPackage;
+import com.facebook.react.bridge.NativeModule;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.uimanager.ViewManager;
+import com.facebook.react.bridge.JavaScriptModule;
+
+public class RCTBluetoothSerialPackage implements ReactPackage {
+    static final String TAG = "BluetoothSerial";
+
+    @Override
+    public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
+        List<NativeModule> modules = new ArrayList<>();
+        modules.add(new RCTBluetoothSerialModule(reactContext));
+        return modules;
+    }
+
+    @Override
+    public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
+        return Collections.emptyList();
+    }
+}
+```
+
+ESTO TE EVITARA PROBLEMAS A LA HORA DE CORRER LA APLICACIÓN EN TU DISPOSITIVO ANDROID
