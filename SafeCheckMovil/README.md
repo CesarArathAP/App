@@ -29,6 +29,7 @@ Este es un archivo `package.json` que describe las dependencias del proyecto Saf
 | react-native-screens                            | `npm install react-native-screens` |
 | react-native-svg                                | `npm install react-native-svg` |
 | vector-icons                                    | `npm install vector-icons` |
+| bluetooth-serial|`npm install react-native-bluetooth-serial`|
 
 ### Dependencias de Desarrollo
 
