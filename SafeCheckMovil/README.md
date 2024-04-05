@@ -58,4 +58,4 @@ Nota: Las Depencias de desarrollo no hacen falta que las decargue por que se ins
 Para instalar todas las dependencias del proyecto, ejecuta el siguiente comando en la terminal:
 
 ```bash
-npm install ```
+npm install
