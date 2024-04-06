@@ -74,7 +74,7 @@ npm install react-native-bluetooth-serial
 
 ### Dirigete a tu carpeta node_modules en la dirección:
 
-`node_modules/react-native-bluetooth-serial/android/app/build.gradle`
+`node_modules/react-native-bluetooth-serial/android/build.gradle`
 
 asegurandote de que el archivo se vea de esta forma
 

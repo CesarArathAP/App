@@ -30,6 +30,10 @@ const VigilanciaScreen = ({ route }) => {
     navigation.navigate('Home')
   }
 
+  const SearchStudentsQR = () => {
+    navigation.navigate('Alumno(a)')
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -46,6 +50,9 @@ const VigilanciaScreen = ({ route }) => {
           </TouchableOpacity>
           <TouchableOpacity style={styles.option} onPress={handleBuscarAlumnos}>
               <Text style={styles.optionText}>Buscar Alumnos</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.option} onPress={SearchStudentsQR}>
+              <Text style={styles.optionText}>Buscar Alumno QR</Text>
             </TouchableOpacity>
           <TouchableOpacity style={styles.option} onPress={VerAlumnosTest}>
             <Text style={styles.optionText}>Test de Alumnos</Text>

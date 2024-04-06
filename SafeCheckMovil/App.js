@@ -20,6 +20,7 @@ import AlumnosTestScreen from './components/AlumnosTestScreen';
 import Notifications_V_Screen from './components/Notifications_V_Screen';
 import Notification_D_Screen from './components/Notifications_D_Screen';
 import VisitasScreen_D from './components/VisitasScreen_D';
+import SearchStudentsQR from './components/SearchStudentsQR';
 
 const Stack = createStackNavigator();
 
@@ -47,6 +48,7 @@ export default function App() {
         <Stack.Screen name="Notificaciones" component={Notifications_V_Screen} />
         <Stack.Screen name="NotifcacionesScreen" component={Notification_D_Screen} />
         <Stack.Screen name="Visitas" component={VisitasScreen_D} />
+        <Stack.Screen name="Alumno(a)" component={SearchStudentsQR} />
       </Stack.Navigator>
     </NavigationContainer>
   );

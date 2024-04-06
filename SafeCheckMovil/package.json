@@ -21,6 +21,7 @@
     "notifee": "^0.0.1",
     "react": "18.2.0",
     "react-native": "^0.73.6",
+    "react-native-bluetooth-serial": "^1.0.0-rc1",
     "react-native-chart-kit": "^6.12.0",
     "react-native-elements": "^3.4.3",
     "react-native-fs": "^2.20.0",
