@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Image, Alert, ScrollView } from 'react-native';
 import { Card } from 'react-native-elements';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { launchImageLibrary } from 'react-native-image-picker';
+import { launchCamera } from 'react-native-image-picker'; // Cambiado de launchImageLibrary a launchCamera
 import PushNotification from 'react-native-push-notification';
 import registrarVisita from '../util/RegistrarVisitas';
 import notificationsApi from '../api/notificationsApi';
@@ -98,7 +98,7 @@ const VisitasScreen = () => {
       maxHeight: 500,
     };
 
-    launchImageLibrary(options, (response) => {
+    launchCamera(options, (response) => { // Cambiado de launchImageLibrary a launchCamera
       if (response.didCancel) {
         console.log('El usuario canceló la selección de la imagen');
       } else if (response.error) {
@@ -168,7 +168,7 @@ const VisitasScreen = () => {
           </TouchableOpacity>
         ) : (
           <TouchableOpacity onPress={handleChoosePhoto}>
-            <Image source={require('../assets/images/tarjeta-de-identificacion.png')} style={styles.defaultImage} />
+            <Image source={require('../assets/images/toma-una-foto.png')} style={styles.defaultImage} />
             <Text style={styles.textSelect}>Seleccionar la fotografía de la identificación de la visita</Text>
           </TouchableOpacity>
         )}

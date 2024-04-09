@@ -1,85 +1,166 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Button, StyleSheet, Alert } from 'react-native';
-import BluetoothSerial from 'react-native-bluetooth-serial';
+import React, { useState, useEffect } from 'react';
+import { View, TextInput, Button, StyleSheet, StatusBar, ScrollView, Text, Alert, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // Importar useNavigation
+import searchAlumnoByMatricula from '../api/search_alumnos_qr';
+import { enviarResultadoPrueba } from '../util/TestAlumnosUtil';
 
 const App = () => {
-  const [qrData, setQrData] = useState('');
-  const [deviceConnected, setDeviceConnected] = useState(false);
-  const [bluetoothEnabled, setBluetoothEnabled] = useState(false);
-  const [readListener, setReadListener] = useState(null);
+  const [inputText, setInputText] = useState('');
+  const [alumnoData, setAlumnoData] = useState(null);
+  const [newInputText, setNewInputText] = useState('');
+  const [showInstructions, setShowInstructions] = useState(true);
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
+  const navigation = useNavigation(); // Obtener la navegación
 
   useEffect(() => {
-    BluetoothSerial.isEnabled().then((enabled) => {
-      setBluetoothEnabled(enabled);
-      if (!enabled) {
-        Alert.alert(
-          'Bluetooth no activado',
-          '¿Desea activar Bluetooth para usar el lector QR?',
-          [
-            {
-              text: 'Cancelar',
-              onPress: () => {},
-              style: 'cancel',
-            },
-            {
-              text: 'Activar',
-              onPress: () => BluetoothSerial.requestEnable(),
-            },
-          ],
-        );
+    // Realizar la búsqueda del alumno cuando se actualice el inputText
+    if (inputText.length === 10) {
+      handleSearchAlumno();
+    }
+  }, [inputText]);
+
+  const handleInputChange = text => {
+    // Limitar la longitud del texto a 10 caracteres
+    setInputText(text.substring(0, 10));
+  };
+
+  const handleSearchAlumno = async () => {
+    try {
+      const alumno = await searchAlumnoByMatricula(inputText);
+      if (alumno) {
+        setAlumnoData(alumno);
+        setShowInstructions(false);
+        const currentDate = new Date();
+        setDate(`${currentDate.getDate()}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()}`);
+        setTime(`${currentDate.getHours()}:${currentDate.getMinutes()}`);
       } else {
-        setDeviceConnected(true);
+        showAlert('Alumno no encontrado', 'El alumno no se encontró en el sistema.');
       }
-    });
-
-    return () => {
-      if (readListener) {
-        readListener.remove();
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (deviceConnected) {
-      BluetoothSerial.connect('2D:C0:06:1E:25:B8')
-        .then(() => console.log('Conexión establecida con el lector QR'))
-        .catch((error) => {
-          Alert.alert('Error al conectar con el lector QR', 'No se ha detectado el lector QR');
-          setDeviceConnected(false);
-        });
+    } catch (error) {
+      console.error('Error searching alumno by matricula:', error);
+      showAlert('Error', 'Ocurrió un error al buscar el alumno.');
     }
-  }, [deviceConnected]);
+  };
 
-  useEffect(() => {
-    if (deviceConnected) {
-      const listener = BluetoothSerial.on('read', (data) => {
-        console.log('Datos del lector QR:', data);
-        setQrData(data); // Actualiza el estado con los datos del lector QR
-      });
-      setReadListener(listener);
+  const handleSendResult = async () => {
+    // Validar que el campo de resultado no esté vacío
+    if (newInputText.trim() === '') {
+      showAlert('Resultado obligatorio', 'Por favor, ingresa el resultado del test.');
+      return;
     }
 
-    return () => {
-      if (readListener) {
-        readListener.remove();
-      }
-    };
-  }, [deviceConnected]);
+    try {
+      const nombreCompleto = `${alumnoData.nombre} ${alumnoData.apellido_paterno} ${alumnoData.apellido_materno}`;
+      const formData = {
+        alumno: {
+          matricula: alumnoData.matricula,
+          nombre: nombreCompleto,
+          grupo: alumnoData.grupo
+        },
+        fecha: date,
+        hora: time,
+        resultado: newInputText
+      };
+      await enviarResultadoPrueba(formData);
+      showAlert('Registro exitoso', 'La prueba fue registrada con éxito.');
+      setNewInputText(''); // Limpiamos el campo de resultado después de enviarlo
+      navigation.goBack(); // Regresar al componente anterior
+    } catch (error) {
+      console.error('Error al enviar el resultado del alumno:', error);
+      showAlert('Error', 'Ocurrió un error al enviar el resultado del alumno.');
+    }
+  };
+
+  const showAlert = (title, message) => {
+    Alert.alert(
+      title,
+      message,
+      [{ text: 'Aceptar', onPress: () => console.log('OK Pressed') }],
+      { cancelable: false }
+    );
+  };
 
   return (
     <View style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Lector QR</Text>
-        {bluetoothEnabled ? (
-          deviceConnected ? (
-            <Text>{qrData}</Text>
-          ) : (
-            <Text style={styles.textqr}>Conectando con el lector QR...</Text>
-          )
-        ) : (
-          <Text style={styles.textqr}>Lector QR no activado. Revise la conexión Bluetooth.</Text>
+      <StatusBar barStyle="light-content" />
+      <ScrollView contentContainerStyle={styles.scrollView}>
+        <View style={styles.inputContainer}>
+          <Text style={styles.title}>Buscar Alumno</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Ingrese matrícula del alumno"
+            onChangeText={handleInputChange}
+            value={inputText}
+            maxLength={10}
+            keyboardType="numeric"
+          />
+        </View>
+        {showInstructions && (
+          <View style={styles.instructionsContainer}>
+            <Text style={styles.instructionsTitle}>Instrucciones:</Text>
+            <View style={styles.instructionsCard}>
+              <View style={styles.instructionsContent}>
+                <Text style={styles.instructionsText}>1. Escanea el código QR para buscar al alumno.</Text>
+                <Text style={styles.instructionsText}>2. Ingresa la matrícula del alumno manualmente en el campo de búsqueda.</Text>
+                <Text style={styles.instructionsNote}>Nota: Debido al rendimiento de la aplicación, se sugiere conectar el lector QR o scanner por Bluetooth antes de iniciar la aplicación para evitar que te saque de la misma. Este problema se resolverá en la próxima versión de la aplicación.</Text>
+              </View>
+              <View style={styles.qrCodeContainer}>
+                <Image source={require('../assets/icons/codigo-qr.png')} style={styles.qrCodeIcon} />
+              </View>
+            </View>
+          </View>
         )}
-      </View>
+        {alumnoData && (
+          <View style={styles.alumnoCard}>
+            <Text style={styles.alumnoTitle}>Información del Alumno</Text>
+            <View style={styles.alumnoDataContainer}>
+              <Text style={styles.dataLabel}>Matrícula:</Text>
+              <TextInput
+                style={styles.alumnoData}
+                value={alumnoData.matricula}
+                editable={false}
+              />
+              <Text style={styles.dataLabel}>Nombre Completo:</Text>
+              <TextInput
+                style={styles.alumnoData}
+                value={`${alumnoData.nombre} ${alumnoData.apellido_paterno} ${alumnoData.apellido_materno}`}
+                editable={false}
+              />
+              <Text style={styles.dataLabel}>Grupo:</Text>
+              <TextInput
+                style={styles.alumnoData}
+                value={alumnoData.grupo}
+                editable={false}
+              />
+              <Text style={[styles.resultText, { color: '#000' }]}>Fecha:</Text>
+              <View style={styles.divider}></View>
+              <TextInput
+                style={styles.newInput}
+                placeholder="Fecha"
+                value={date}
+                editable={false}
+              />
+              <Text style={[styles.resultText, { color: '#000' }]}>Hora:</Text>
+              <TextInput
+                style={styles.newInput}
+                placeholder="Hora"
+                value={time}
+                editable={false}
+              />
+              <Text style={[styles.resultText, { color: '#000' }]}>Resultado del Test</Text>
+              <TextInput
+                style={styles.newInput}
+                placeholder="Resultado"
+                onChangeText={text => setNewInputText(text)}
+                value={newInputText}
+                keyboardType="numeric" // Cambiar a tipo numérico
+              />
+              <Button title="Enviar resultado de alumno" onPress={handleSendResult} />
+            </View>
+          </View>
+        )}
+      </ScrollView>
     </View>
   );
 };
@@ -87,18 +168,32 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 50,
-    paddingHorizontal: 20,
-    alignItems: 'center',
-    //justifyContent: 'center',
-  },
-  card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
+    backgroundColor: '#f0f0f0',
     padding: 20,
+  },
+  scrollView: {
+    flexGrow: 1,
+  },
+  inputContainer: {
     marginBottom: 20,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  input: {
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 5,
     color: 'black',
-    width: '100%',
+    borderWidth: 1,
+    borderColor: '#ddd'
+  },
+  alumnoCard: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -108,14 +203,95 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
-  cardTitle: {
-    fontSize: 24,
+  alumnoTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: 'black'
+    color: '#000',
   },
-  textqr: {
-    color: 'black'
+  alumnoDataContainer: {
+    marginTop: 10,
+  },
+  alumnoData: {
+    fontSize: 16,
+    marginBottom: 10,
+    color: '#000',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 5,
+    padding: 10,
+  },
+  divider: {
+    borderBottomColor: '#000',
+    borderBottomWidth: 1,
+    marginBottom: 10,
+  },
+  resultText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#000',
+  },
+  newInput: {
+    backgroundColor: '#fff',
+    padding: 10,
+    marginTop: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    color: '#000',
+  },
+  instructionsContainer: {
+    marginBottom: 20,
+  },
+  qrCodeContainer: {
+    alignItems: 'center',
+  },
+  qrCodeIcon: {
+    width: 50,
+    height: 50,
+  },
+  instructionsCard: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  instructionsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#000',
+    alignSelf: 'center',
+  },
+  instructionsContent: {
+    flex: 1,
+  },
+  instructionsText: {
+    fontSize: 16,
+    marginBottom: 5,
+    color: '#000',
+  },
+  instructionsNote: {
+    fontSize: 14,
+    color: '#555',
+    fontStyle: 'italic',
+    marginTop: 10,
+  },
+  dataLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#000',
   },
 });
 
