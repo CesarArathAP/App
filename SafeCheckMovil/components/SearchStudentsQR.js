@@ -102,7 +102,7 @@ const App = () => {
             <View style={styles.instructionsCard}>
               <View style={styles.instructionsContent}>
                 <Text style={styles.instructionsText}>1. Escanea el código QR para buscar al alumno.</Text>
-                <Text style={styles.instructionsText}>2. Ingresa la matrícula del alumno manualmente en el campo de búsqueda.</Text>
+                <Text style={styles.instructionsText}>2. Ingresa la matrícula del alumno manualmente en caso de no contar con el Scanner en la barra de búsqueda.</Text>
                 <Text style={styles.instructionsNote}>Nota: Debido al rendimiento de la aplicación, se sugiere conectar el lector QR o scanner por Bluetooth antes de iniciar la aplicación para evitar que te saque de la misma. Este problema se resolverá en la próxima versión de la aplicación.</Text>
               </View>
               <View style={styles.qrCodeContainer}>
@@ -181,6 +181,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: 'black'
   },
   input: {
     backgroundColor: '#fff',
