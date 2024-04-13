@@ -1,15 +1,17 @@
-// api/api_arduino_mq3.js
-
-import axios from 'axios';
-
-const obtenerDatosSensorMQ3 = async () => {
-  try {
-    const response = await axios.get('http://192.168.1.40:3000/arduino-mq3'); // 130.131.4.148 o 192.168.1.40
-    return response.data;
-  } catch (error) {
-    console.error('Error en la solicitud al servidor:', error);
-    throw error;
+export async function fetchData(setPorcentaje) {
+    try {
+      const response = await fetch('http://192.168.1.40:5000/datos_serial');
+      const data = await response.json();
+      if (data.datos && data.datos.length > 0) {
+        setPorcentaje(data.datos[data.datos.length - 1]);
+      } else {
+        console.error('No se recibió ningún dato del Arduino');
+      }
+    } catch (error) {
+      console.error('Error al obtener datos del Arduino:', error);
+    }
   }
-};
-
-export default obtenerDatosSensorMQ3;
+  
+  export function clearInterval(interval) {
+    clearInterval(interval);
+  }  

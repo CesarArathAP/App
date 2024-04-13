@@ -3,6 +3,7 @@ import { View, TextInput, Button, StyleSheet, StatusBar, ScrollView, Text, Alert
 import { useNavigation } from '@react-navigation/native'; // Importar useNavigation
 import searchAlumnoByMatricula from '../api/search_alumnos_qr';
 import { enviarResultadoPrueba } from '../util/TestAlumnosUtil';
+import { fetchData } from '../api/api_arduino_mq3'; // Importar la función fetchData desde el archivo api_arduino_mq3
 
 const App = () => {
   const [inputText, setInputText] = useState('');
@@ -11,6 +12,7 @@ const App = () => {
   const [showInstructions, setShowInstructions] = useState(true);
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
+  const [porcentaje, setPorcentaje] = useState(null); // Agregar estado para el porcentaje
   const navigation = useNavigation(); // Obtener la navegación
 
   useEffect(() => {
@@ -19,6 +21,21 @@ const App = () => {
       handleSearchAlumno();
     }
   }, [inputText]);
+
+  useEffect(() => {
+    if (alumnoData) {
+      // Realizar la llamada a la API una vez que aparezcan los datos del alumno
+      fetchData(setPorcentaje);
+
+      // Actualizar el porcentaje cada 5 segundos
+      const interval = setInterval(() => {
+        fetchData(setPorcentaje);
+      }, 5000);
+
+      // Limpiar el intervalo cuando el componente se desmonte
+      return () => clearInterval(interval);
+    }
+  }, [alumnoData]);
 
   const handleInputChange = text => {
     // Limitar la longitud del texto a 10 caracteres
@@ -69,6 +86,12 @@ const App = () => {
     } catch (error) {
       console.error('Error al enviar el resultado del alumno:', error);
       showAlert('Error', 'Ocurrió un error al enviar el resultado del alumno.');
+    }
+  };
+
+  const handleCaptureValue = () => {
+    if (porcentaje !== null) {
+      setNewInputText(`${porcentaje}`);
     }
   };
 
@@ -148,14 +171,14 @@ const App = () => {
                 value={time}
                 editable={false}
               />
-              <Text style={[styles.resultText, { color: '#000' }]}>Resultado del Test</Text>
+              <Text style={[styles.resultText, { color: '#000' }]}>Porcentaje de Alcohol:</Text>
               <TextInput
                 style={styles.newInput}
-                placeholder="Resultado"
-                onChangeText={text => setNewInputText(text)}
-                value={newInputText}
-                keyboardType="numeric" // Cambiar a tipo numérico
+                placeholder="Porcentaje"
+                value={porcentaje !== null ? `${porcentaje}` : 'Cargando...'} // Mostrar el porcentaje si está disponible
+                editable={false}
               />
+              <Button title="Capturar Valor" onPress={handleCaptureValue} />
               <Button title="Enviar resultado de alumno" onPress={handleSendResult} />
             </View>
           </View>
