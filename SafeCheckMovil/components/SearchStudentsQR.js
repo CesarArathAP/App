@@ -63,7 +63,7 @@ const App = () => {
   const handleSendResult = async () => {
     // Validar que el campo de resultado no esté vacío
     if (newInputText.trim() === '') {
-      showAlert('Resultado obligatorio', 'Por favor, ingresa el resultado del test.');
+      showAlert('Resultado obligatorio', 'Por favor, captura el resultado del test.');
       return;
     }
 

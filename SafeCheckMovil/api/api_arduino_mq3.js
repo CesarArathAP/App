@@ -8,10 +8,10 @@ export async function fetchData(setPorcentaje) {
         console.error('No se recibió ningún dato del Arduino');
       }
     } catch (error) {
-      console.error('Error al obtener datos del Arduino:', error);
+      console.error('Esperando una Respuesta de Arduino');
     }
   }
   
   export function clearInterval(interval) {
     clearInterval(interval);
-  }  
+  }
