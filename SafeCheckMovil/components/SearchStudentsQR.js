@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, StyleSheet, StatusBar, ScrollView, Text, Alert, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; // Importar useNavigation
+import { useNavigation } from '@react-navigation/native';
+import PushNotification from 'react-native-push-notification'; // Importar la biblioteca de notificaciones push
 import searchAlumnoByMatricula from '../api/search_alumnos_qr';
 import { enviarResultadoPrueba } from '../util/TestAlumnosUtil';
-import { fetchData } from '../api/api_arduino_mq3'; // Importar la función fetchData desde el archivo api_arduino_mq3
+import { fetchData } from '../api/api_arduino_mq3';
+import notificationsApi from '../api/notificationsApi'; // Importar la función para enviar notificaciones
 
 const App = () => {
   const [inputText, setInputText] = useState('');
@@ -12,11 +14,21 @@ const App = () => {
   const [showInstructions, setShowInstructions] = useState(true);
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
-  const [porcentaje, setPorcentaje] = useState(null); // Agregar estado para el porcentaje
-  const navigation = useNavigation(); // Obtener la navegación
+  const [porcentaje, setPorcentaje] = useState(null);
+  const navigation = useNavigation();
 
   useEffect(() => {
-    // Realizar la búsqueda del alumno cuando se actualice el inputText
+    // Crear canal de notificación
+    PushNotification.createChannel({
+      channelId: 'default-channel-id',
+      channelName: 'Default Channel',
+      channelDescription: 'Canal predeterminado para las notificaciones',
+      playSound: true,
+      soundName: 'default',
+      importance: 4,
+      vibrate: true,
+    });
+
     if (inputText.length === 10) {
       handleSearchAlumno();
     }
@@ -24,21 +36,17 @@ const App = () => {
 
   useEffect(() => {
     if (alumnoData) {
-      // Realizar la llamada a la API una vez que aparezcan los datos del alumno
       fetchData(setPorcentaje);
 
-      // Actualizar el porcentaje cada 5 segundos
       const interval = setInterval(() => {
         fetchData(setPorcentaje);
       }, 5000);
 
-      // Limpiar el intervalo cuando el componente se desmonte
       return () => clearInterval(interval);
     }
   }, [alumnoData]);
 
   const handleInputChange = text => {
-    // Limitar la longitud del texto a 10 caracteres
     setInputText(text.substring(0, 10));
   };
 
@@ -61,7 +69,6 @@ const App = () => {
   };
 
   const handleSendResult = async () => {
-    // Validar que el campo de resultado no esté vacío
     if (newInputText.trim() === '') {
       showAlert('Resultado obligatorio', 'Por favor, captura el resultado del test.');
       return;
@@ -81,12 +88,31 @@ const App = () => {
       };
       await enviarResultadoPrueba(formData);
       showAlert('Registro exitoso', 'La prueba fue registrada con éxito.');
-      setNewInputText(''); // Limpiamos el campo de resultado después de enviarlo
-      navigation.goBack(); // Regresar al componente anterior
+
+      // Mostrar notificación después de enviar el resultado
+      showNotification(alumnoData, newInputText);
+
+      setNewInputText('');
+      navigation.goBack();
     } catch (error) {
       console.error('Error al enviar el resultado del alumno:', error);
       showAlert('Error', 'Ocurrió un error al enviar el resultado del alumno.');
     }
+  };
+
+  const showNotification = (alumnoData, resultado) => {
+    const alumnoInfo = `${alumnoData.matricula}, ${alumnoData.nombre}, ${alumnoData.grupo}`;
+    const notificationMessage = `Resultado de alcohol: ${resultado}`;
+
+    // Enviar la notificación al servidor API
+    notificationsApi.sendNotification('Nuevo resultado de prueba', `${alumnoInfo}: ${notificationMessage}`);
+
+    // Mostrar la notificación localmente en el dispositivo
+    PushNotification.localNotification({
+      channelId: 'default-channel-id',
+      title: 'Nuevo resultado de prueba',
+      message: `${alumnoInfo}: ${notificationMessage}`,
+    });
   };
 
   const handleCaptureValue = () => {
@@ -175,7 +201,7 @@ const App = () => {
               <TextInput
                 style={styles.newInput}
                 placeholder="Porcentaje"
-                value={porcentaje !== null ? `${porcentaje}` : 'Cargando...'} // Mostrar el porcentaje si está disponible
+                value={porcentaje !== null ? `${porcentaje}` : 'Cargando...'}
                 editable={false}
               />
               <Button title="Capturar Valor" onPress={handleCaptureValue} />
